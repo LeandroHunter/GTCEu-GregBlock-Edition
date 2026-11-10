@@ -34,7 +34,6 @@ import com.lowdragmc.lowdraglib.jei.JEIPlugin;
 import net.minecraft.network.chat.Component;
 
 import com.google.common.collect.Tables;
-import dev.emi.emi.api.EmiApi;
 import me.shedaniel.rei.api.client.view.ViewSearchBuilder;
 
 import java.util.ArrayList;
@@ -136,8 +135,7 @@ public class LayeredRecipeUIHelper {
                                                     .map(GTRecipeJEICategory::machineType)
                                                     .collect(Collectors.toList()));
                                 } else if (GTCEu.Mods.isEMILoaded()) {
-                                    EmiApi.displayRecipeCategory(
-                                            GTRecipeEMICategory.machineCategory(rootRecipe.getType().getCategory()));
+                                    GTRecipeEMICategory.openRecipes(rootRecipe.getType());
                                 }
                             }
                         }).setHoverTooltips("gtceu.recipe_type.show_recipes"));

@@ -27,7 +27,6 @@ public class GTMixinPlugin implements IMixinConfigPlugin {
 
     static {
         MOD_COMPAT_MIXINS.put("roughlyenoughitems", MIXIN_PACKAGE + "rei");
-        addModCompatMixin("ae2");
         addModCompatMixin("emi");
         addModCompatMixin("jei");
         addModCompatMixin("top");
@@ -38,6 +37,9 @@ public class GTMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+        if (mixinClassName.startsWith(MIXIN_PACKAGE + "ae2.")) {
+            return isModLoaded("ae2") && isModLoaded("emi");
+        }
         for (var compatMod : MOD_COMPAT_MIXINS.entrySet()) {
             if (mixinClassName.startsWith(compatMod.getValue())) {
                 return isModLoaded(compatMod.getKey());

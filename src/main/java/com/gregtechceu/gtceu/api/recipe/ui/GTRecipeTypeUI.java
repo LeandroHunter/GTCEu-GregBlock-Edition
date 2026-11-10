@@ -42,7 +42,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 
 import com.google.common.collect.Table;
-import dev.emi.emi.api.EmiApi;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectArrayMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2IntAVLTreeMap;
@@ -258,8 +257,7 @@ public class GTRecipeTypeUI {
                                                         .map(GTRecipeJEICategory::machineType)
                                                         .collect(Collectors.toList()));
                                     } else if (GTCEu.Mods.isEMILoaded()) {
-                                        EmiApi.displayRecipeCategory(
-                                                GTRecipeEMICategory.machineCategory(recipeType.getCategory()));
+                                        GTRecipeEMICategory.openRecipes(recipeType);
                                     }
                                 }
                             }).setHoverTooltips("gtceu.recipe_type.show_recipes"));

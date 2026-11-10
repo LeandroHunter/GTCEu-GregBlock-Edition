@@ -7,20 +7,25 @@ import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.recipe.category.GTRecipeCategory;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
+import com.gregtechceu.gtceu.core.mixins.emi.EmiApiAccessor;
 
 import com.lowdragmc.lowdraglib.emi.IGui2Renderable;
 
 import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
 
+import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.EmiRegistry;
+import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.stack.EmiStack;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 public class GTRecipeEMICategory extends EmiRecipeCategory {
@@ -86,6 +91,17 @@ public class GTRecipeEMICategory extends EmiRecipeCategory {
                 }
             }
         }
+    }
+
+    public static void openRecipes(GTRecipeType type) {
+        var manager = EmiApi.getRecipeManager();
+        Map<EmiRecipeCategory, List<EmiRecipe>> recipes = new LinkedHashMap<>();
+        for (GTRecipeCategory category : type.getCategories()) {
+            if (!category.isXEIVisible()) continue;
+            var emiCategory = machineCategory(category);
+            recipes.put(emiCategory, manager.getRecipes(emiCategory));
+        }
+        EmiApiAccessor.gtceu$setPages(recipes, EmiStack.EMPTY);
     }
 
     public static EmiRecipeCategory machineCategory(GTRecipeCategory category) {

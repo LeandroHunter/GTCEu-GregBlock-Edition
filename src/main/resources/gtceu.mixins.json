@@ -21,6 +21,7 @@
         "client.MultiPlayerGameModeMixin",
         "client.PlayerInfoAccessor",
         "client.VariantDeserializerMixin",
+        "emi.EmiApiAccessor",
         "ftbchunks.FTBChunksClientMixin",
         "ftbchunks.LargeMapScreenMixin",
         "ftbchunks.RegionMapPanelMixin",
