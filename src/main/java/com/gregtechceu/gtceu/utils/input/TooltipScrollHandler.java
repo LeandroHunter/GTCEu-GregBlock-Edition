@@ -12,6 +12,7 @@ import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.systems.RenderSystem;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -28,16 +29,18 @@ public class TooltipScrollHandler {
     private static @Nullable TooltipState CURRENT_TOOLTIP = null;
 
     public static int getCurrentTooltipPage() {
-        if (CURRENT_TOOLTIP == null) return 0;
+        if (!RenderSystem.isOnRenderThread() || CURRENT_TOOLTIP == null) return 0;
         return CURRENT_TOOLTIP.page;
     }
 
     public static int getCurrentTooltipModifier() {
-        if (CURRENT_TOOLTIP == null) return 0;
+        if (!RenderSystem.isOnRenderThread() || CURRENT_TOOLTIP == null) return 0;
         return CURRENT_TOOLTIP.modifier;
     }
 
     public static void setCurrentTooltipMachine(MachineDefinition definition) {
+        // Recipe viewers may build their search index on worker threads.
+        if (!RenderSystem.isOnRenderThread()) return;
         var newId = definition.getId();
         if (CURRENT_TOOLTIP_MACHINE_ID != null && CURRENT_TOOLTIP_MACHINE_ID.equals(newId)) return;
 
@@ -68,7 +71,7 @@ public class TooltipScrollHandler {
     }
 
     public static void onTooltipEvent(ItemTooltipEvent event) {
-        if (CURRENT_TOOLTIP == null || CURRENT_TOOLTIP_MACHINE_ID == null) return;
+        if (!RenderSystem.isOnRenderThread() || CURRENT_TOOLTIP == null || CURRENT_TOOLTIP_MACHINE_ID == null) return;
 
         if (event.getItemStack().getItem() instanceof BlockItem blockItem) {
             if (blockItem.getBlock() instanceof MetaMachineBlock metaMachineBlock) {

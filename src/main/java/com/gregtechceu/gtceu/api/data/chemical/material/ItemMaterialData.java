@@ -44,10 +44,13 @@ public class ItemMaterialData {
     /** Used for custom material data for items that do not fall into the normal "prefix, material" pair */
     public static final Map<Item, ItemMaterialInfo> ITEM_MATERIAL_INFO = new Object2ObjectOpenHashMap<>();
     /** Mapping of an item to a "prefix, material" pair */
-    public static final List<Pair<Supplier<? extends Item>, MaterialEntry>> ITEM_MATERIAL_ENTRY = new ArrayList<>();
-    public static final Map<Item, MaterialEntry> ITEM_MATERIAL_ENTRY_COLLECTED = new Object2ObjectOpenHashMap<>();
+    public static final List<Pair<Supplier<? extends Item>, MaterialEntry>> ITEM_MATERIAL_ENTRY = Collections
+            .synchronizedList(new ArrayList<>());
+    public static final Map<Item, MaterialEntry> ITEM_MATERIAL_ENTRY_COLLECTED = Collections
+            .synchronizedMap(new Object2ObjectOpenHashMap<>());
     /** Mapping of a tag to a "prefix, material" pair */
-    public static final Map<TagKey<Item>, MaterialEntry> TAG_MATERIAL_ENTRY = new Object2ObjectLinkedOpenHashMap<>();
+    public static final Map<TagKey<Item>, MaterialEntry> TAG_MATERIAL_ENTRY = Collections
+            .synchronizedMap(new Object2ObjectLinkedOpenHashMap<>());
     /** Mapping of a fluid to a material */
     public static final Map<Fluid, Material> FLUID_MATERIAL = new Object2ObjectOpenHashMap<>();
     /** Mapping of all items that represent a "prefix, material" pair */

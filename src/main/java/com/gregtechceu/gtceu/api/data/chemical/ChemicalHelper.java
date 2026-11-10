@@ -182,10 +182,12 @@ public class ChemicalHelper {
         if (materialEntry == null) {
             // Resolve all the lazy suppliers once, rather than on each request. This avoids O(n) lookup performance
             // for unification entries.
-            for (var entry : ITEM_MATERIAL_ENTRY) {
-                ITEM_MATERIAL_ENTRY_COLLECTED.put(entry.getFirst().get().asItem(), entry.getSecond());
+            synchronized (ITEM_MATERIAL_ENTRY) {
+                for (var entry : ITEM_MATERIAL_ENTRY) {
+                    ITEM_MATERIAL_ENTRY_COLLECTED.put(entry.getFirst().get().asItem(), entry.getSecond());
+                }
+                ITEM_MATERIAL_ENTRY.clear();
             }
-            ITEM_MATERIAL_ENTRY.clear();
 
             // guess an entry based on the item's tags if none are pre-registered.
             materialEntry = ITEM_MATERIAL_ENTRY_COLLECTED.computeIfAbsent(itemKey, item -> {
@@ -204,23 +206,23 @@ public class ChemicalHelper {
     }
 
     public static MaterialEntry getMaterialEntry(TagKey<Item> tag) {
-        if (TAG_MATERIAL_ENTRY.isEmpty()) {
-            // If the map is empty, resolve all possible tags to their values in an attempt to save time on later
-            // lookups.
-            Set<TagKey<Item>> allItemTags = BuiltInRegistries.ITEM.getTagNames().collect(Collectors.toSet());
-            for (TagPrefix prefix : TagPrefix.values()) {
-                for (Material material : GTCEuAPI.materialManager.getRegisteredMaterials()) {
-                    Arrays.stream(prefix.getItemTags(material))
-                            .filter(allItemTags::contains)
-                            .forEach(tagKey -> {
-                                // remove the tag so that the next iteration is faster.
-                                allItemTags.remove(tagKey);
-                                TAG_MATERIAL_ENTRY.put(tagKey, new MaterialEntry(prefix, material));
-                            });
+        synchronized (TAG_MATERIAL_ENTRY) {
+            if (TAG_MATERIAL_ENTRY.isEmpty()) {
+                // Populate the tag cache before other tooltip threads look up individual tags.
+                Set<TagKey<Item>> allItemTags = BuiltInRegistries.ITEM.getTagNames().collect(Collectors.toSet());
+                for (TagPrefix prefix : TagPrefix.values()) {
+                    for (Material material : GTCEuAPI.materialManager.getRegisteredMaterials()) {
+                        Arrays.stream(prefix.getItemTags(material))
+                                .filter(allItemTags::contains)
+                                .forEach(tagKey -> {
+                                    allItemTags.remove(tagKey);
+                                    TAG_MATERIAL_ENTRY.put(tagKey, new MaterialEntry(prefix, material));
+                                });
+                    }
                 }
             }
+            return TAG_MATERIAL_ENTRY.getOrDefault(tag, MaterialEntry.NULL_ENTRY);
         }
-        return TAG_MATERIAL_ENTRY.getOrDefault(tag, MaterialEntry.NULL_ENTRY);
     }
 
     public static List<ItemLike> getItems(MaterialEntry materialEntry) {
