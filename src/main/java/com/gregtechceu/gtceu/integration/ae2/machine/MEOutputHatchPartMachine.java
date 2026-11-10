@@ -23,6 +23,8 @@ import net.minecraftforge.fluids.FluidStack;
 
 import appeng.api.config.Actionable;
 import appeng.api.stacks.AEFluidKey;
+import appeng.api.stacks.AEKey;
+import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,6 +42,10 @@ public class MEOutputHatchPartMachine extends MEHatchPartMachine implements IMac
 
     @Persisted
     private KeyStorage internalBuffer; // Do not use KeyCounter, use our simple implementation
+
+    public Iterable<Object2LongMap.Entry<AEKey>> getBufferedOutput() {
+        return internalBuffer;
+    }
 
     public MEOutputHatchPartMachine(IMachineBlockEntity holder, Object... args) {
         super(holder, IO.OUT, args);

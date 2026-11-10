@@ -9,6 +9,7 @@ import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
 import com.gregtechceu.gtceu.common.machine.electric.BatteryBufferMachine;
 import com.gregtechceu.gtceu.common.machine.electric.ChargerMachine;
+import com.gregtechceu.gtceu.utils.FormattingUtil;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
@@ -39,7 +40,8 @@ public class BatteryStorageInfoProvider implements IBlockComponentProvider, ISer
                     CompoundTag container = tag.getCompound("energy");
                     long changed = container.getLong("changed"), stored = container.getLong("stored"),
                             capacity = container.getLong("capacity");
-                    iTooltip.add(Component.translatable("gtceu.jade.changes_eu_sec", formatLongNumber(changed)));
+                    iTooltip.add(Component.translatable("gtceu.jade.changes_eu_tick",
+                            FormattingUtil.formatNumbers(changed / 20.0)));
                     if (changed > 0L) {
                         iTooltip.add(Component
                                 .translatable("gtceu.jade.remaining_charge_time",

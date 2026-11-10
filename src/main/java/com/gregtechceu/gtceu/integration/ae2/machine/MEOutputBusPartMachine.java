@@ -21,6 +21,8 @@ import net.minecraft.world.item.ItemStack;
 
 import appeng.api.config.Actionable;
 import appeng.api.stacks.AEItemKey;
+import appeng.api.stacks.AEKey;
+import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,6 +43,10 @@ public class MEOutputBusPartMachine extends MEBusPartMachine implements IMachine
 
     @Persisted
     private KeyStorage internalBuffer; // Do not use KeyCounter, use our simple implementation
+
+    public Iterable<Object2LongMap.Entry<AEKey>> getBufferedOutput() {
+        return internalBuffer;
+    }
 
     public MEOutputBusPartMachine(IMachineBlockEntity holder, Object... args) {
         super(holder, IO.OUT, args);

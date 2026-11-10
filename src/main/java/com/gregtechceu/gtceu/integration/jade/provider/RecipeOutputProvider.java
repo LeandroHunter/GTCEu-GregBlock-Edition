@@ -209,7 +209,7 @@ public class RecipeOutputProvider extends CapabilityBlockProvider<RecipeLogic> {
                             String.valueOf(provider.getCountProvider().getMinValue()),
                             String.valueOf(provider.getCountProvider().getMaxValue())));
                 } else {
-                    item = itemOutput.getItems()[0];
+                    item = itemOutput.getItems()[0].copy();
                     text.append(String.valueOf(item.getCount()));
                     item.setCount(1);
                 }

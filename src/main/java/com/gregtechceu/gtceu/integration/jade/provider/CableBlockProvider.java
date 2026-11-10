@@ -6,6 +6,7 @@ import com.gregtechceu.gtceu.common.block.CableBlock;
 import com.gregtechceu.gtceu.common.blockentity.CableBlockEntity;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
@@ -43,6 +44,10 @@ public class CableBlockProvider implements IBlockComponentProvider, IServerDataP
                     iTooltip.append(Component.literal(DECIMAL_FORMAT_1F.format(amperage) + "A / "));
                 }
                 iTooltip.append(Component.literal(DECIMAL_FORMAT_1F.format(tag.getDouble("maxAmperage")) + "A"));
+                if (tag.contains("overload")) {
+                    iTooltip.add(Component.translatable("gtceu.jade.cable_overloaded", tag.getInt("overload"))
+                            .withStyle(ChatFormatting.RED));
+                }
             }
         }
     }
@@ -59,6 +64,11 @@ public class CableBlockProvider implements IBlockComponentProvider, IServerDataP
                 cableData.putLong("currentVoltage", cable.getCurrentMaxVoltage());
                 cableData.putDouble("maxAmperage", cable.getMaxAmperage());
                 cableData.putDouble("currentAmperage", cable.getAverageAmperage());
+                int ambient = cable.getDefaultTemp();
+                int temperature = cable.getTemperature();
+                if (temperature > ambient) {
+                    cableData.putInt("overload", 100 * (temperature - ambient) / (cable.getMeltTemp() - ambient));
+                }
                 data.put("cableData", cableData);
             }
         }

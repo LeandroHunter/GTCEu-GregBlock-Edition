@@ -106,6 +106,10 @@ public class IntegrationLang {
         provider.add("gtceu.jade.remaining_charge_time", "Until charged: %s");
         provider.add("gtceu.jade.remaining_discharge_time", "Until empty: %s");
         provider.add("gtceu.jade.changes_eu_sec", "%s EU/s");
+        provider.add("gtceu.jade.changes_eu_tick", "%s EU/t");
+        provider.add("gtceu.jade.programmed_circuit", "Circuit configuration: %s");
+        provider.add("gtceu.jade.cable_overloaded", "Cable overload: %s%%");
+        provider.add("config.jade.plugin_gtceu.programmed_circuit_info", "Programmed Circuit");
         provider.add("gtceu.jade.seconds", "%s seconds");
         provider.add("gtceu.jade.minutes", "%s minutes");
         provider.add("gtceu.jade.hours", "%s hours");

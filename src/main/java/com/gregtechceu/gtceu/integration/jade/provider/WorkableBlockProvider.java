@@ -36,6 +36,7 @@ public class WorkableBlockProvider extends CapabilityBlockProvider<IWorkable> {
     @Override
     protected void write(CompoundTag data, IWorkable capability) {
         data.putBoolean("Active", capability.isActive());
+        data.putBoolean("WorkingEnabled", capability.isWorkingEnabled());
         data.putInt("Progress", capability.getProgress());
         data.putInt("MaxProgress", capability.getMaxProgress());
         // Check if IWorkable is a research station and add flag to data

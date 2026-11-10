@@ -12,7 +12,6 @@ import com.gregtechceu.gtceu.api.machine.steam.SimpleSteamMachine;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
 import com.gregtechceu.gtceu.api.recipe.RecipeHelper;
 import com.gregtechceu.gtceu.client.util.TooltipHelper;
-import com.gregtechceu.gtceu.common.machine.multiblock.part.EnergyHatchPartMachine;
 import com.gregtechceu.gtceu.common.machine.multiblock.steam.SteamParallelMultiblockMachine;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gregtechceu.gtceu.utils.GTUtil;
@@ -63,24 +62,16 @@ public class RecipeLogicProvider extends CapabilityBlockProvider<RecipeLogic> {
         }
     }
 
-    // this function always returns 32 for multiblocks
+    // AI-GENERATED (modified): Codex | 2026-11-10T04:31:26.881Z
     public static long getVoltage(RecipeLogic capability) {
-        long voltage = -1;
         if (capability.machine instanceof SimpleTieredMachine machine) {
-            voltage = GTValues.V[machine.getTier()];
+            return GTValues.V[machine.getTier()];
         } else if (capability.machine instanceof SimpleGeneratorMachine machine) {
-            voltage = GTValues.V[machine.getTier()];
+            return GTValues.V[machine.getTier()];
         } else if (capability.machine instanceof WorkableElectricMultiblockMachine machine) {
-            voltage = machine.getParts().stream()
-                    .filter(EnergyHatchPartMachine.class::isInstance) // doesn't find instances?
-                    .map(EnergyHatchPartMachine.class::cast)
-                    .mapToLong(dynamo -> GTValues.V[dynamo.getTier()])
-                    .max()
-                    .orElse(-1);
+            return machine.getMaxVoltage();
         }
-        // default display as LV, this shouldn't happen because a machine is either electric or steam
-        if (voltage == -1) voltage = 32;
-        return voltage;
+        return 0;
     }
 
     @Override
@@ -110,7 +101,8 @@ public class RecipeLogicProvider extends CapabilityBlockProvider<RecipeLogic> {
                         text = Component.translatable("gtceu.jade.fluid_use", FormattingUtil.formatNumbers(EUt))
                                 .withStyle(ChatFormatting.GREEN);
                     } else {
-                        var tier = GTUtil.getTierByVoltage(EUt);
+                        var voltage = recipeInfo.getLong("voltage");
+                        var tier = GTUtil.getTierByVoltage(voltage > 0 ? voltage : EUt);
                         float minAmperage = (float) EUt / GTValues.V[tier];
 
                         text = Component
@@ -124,7 +116,8 @@ public class RecipeLogicProvider extends CapabilityBlockProvider<RecipeLogic> {
                                     .withStyle(style -> style.withColor(GTValues.VC[tier]));
                         } else {
                             int calculatedSpeed = Mth
-                                    .ceil(Math.log((double) EUt / GTValues.V[GTValues.MAX]) / Math.log(4));
+                                    .ceil(Math.log((double) (voltage > 0 ? voltage : EUt) / GTValues.V[GTValues.MAX]) /
+                                            Math.log(4));
                             int speed = Mth.clamp(calculatedSpeed, 0, GTValues.TIER_COUNT);
                             if (speed == 0) {
                                 voltageTier = Component.literal(GTValues.VNF[tier])

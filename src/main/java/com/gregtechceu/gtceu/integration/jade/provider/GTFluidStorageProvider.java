@@ -3,10 +3,15 @@ package com.gregtechceu.gtceu.integration.jade.provider;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
+import com.gregtechceu.gtceu.common.machine.multiblock.part.FluidHatchPartMachine;
 import com.gregtechceu.gtceu.common.machine.storage.CreativeTankMachine;
 import com.gregtechceu.gtceu.common.machine.storage.QuantumTankMachine;
 import com.gregtechceu.gtceu.integration.ae2.machine.MEPatternBufferPartMachine;
 import com.gregtechceu.gtceu.integration.ae2.machine.MEPatternBufferProxyPartMachine;
+import com.gregtechceu.gtceu.integration.ae2.machine.MEInputHatchPartMachine;
+import com.gregtechceu.gtceu.integration.ae2.machine.MEOutputHatchPartMachine;
+import com.gregtechceu.gtceu.integration.ae2.slot.ExportOnlyAEFluidList;
+import com.gregtechceu.gtceu.utils.GTMath;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -16,6 +21,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 
+import appeng.api.stacks.AEFluidKey;
 import org.jetbrains.annotations.Nullable;
 import snownee.jade.addon.universal.FluidStorageProvider;
 import snownee.jade.api.Accessor;
@@ -53,6 +59,7 @@ public enum GTFluidStorageProvider implements IServerExtensionProvider<MetaMachi
         return ClientViewGroup.map(groups, GTFluidStorageProvider::readFluid, null);
     }
 
+    // AI-GENERATED (modified): Codex | 2026-11-10T04:32:54.536Z
     @Override
     public @Nullable List<ViewGroup<CompoundTag>> getGroups(ServerPlayer serverPlayer, ServerLevel serverLevel,
                                                             MetaMachineBlockEntity mmbe, boolean b) {
@@ -79,6 +86,35 @@ public enum GTFluidStorageProvider implements IServerExtensionProvider<MetaMachi
             var buffer = proxy.getBuffer();
             if (buffer == null) return Collections.emptyList();
             return FluidStorageProvider.INSTANCE.getGroups(serverPlayer, serverLevel, buffer.holder, b);
+        } else if (GTCEu.Mods.isAE2Loaded() && machine instanceof MEInputHatchPartMachine hatch &&
+                hatch.tank instanceof ExportOnlyAEFluidList inputs) {
+            List<CompoundTag> list = new ArrayList<>();
+            for (var slot : inputs.getInventory()) {
+                var fluid = slot.getFluid();
+                if (fluid.isEmpty()) continue;
+                var config = slot.getConfig();
+                long capacity = config == null || config.amount() <= 1 ? fluid.getAmount() : config.amount();
+                list.add(JadeForgeUtils.fromFluidStack(fluid, capacity));
+            }
+            return list.isEmpty() ? List.of() : List.of(new ViewGroup<>(list));
+        } else if (GTCEu.Mods.isAE2Loaded() && machine instanceof MEOutputHatchPartMachine hatch) {
+            List<CompoundTag> list = new ArrayList<>();
+            for (var entry : hatch.getBufferedOutput()) {
+                if (entry.getKey() instanceof AEFluidKey key && entry.getLongValue() > 0) {
+                    long amount = entry.getLongValue();
+                    var tag = JadeForgeUtils.fromFluidStack(key.toStack(GTMath.saturatedCast(amount)), amount);
+                    tag.putBoolean("special", true);
+                    tag.putLong("amount", amount);
+                    list.add(tag);
+                }
+            }
+            return list.isEmpty() ? List.of() : List.of(new ViewGroup<>(list));
+        } else if (machine instanceof FluidHatchPartMachine hatch && hatch.tank.getTanks() == 1 &&
+                hatch.tank.getFluidInTank(0).isEmpty() && hatch.tank.isLocked()) {
+            var tag = JadeForgeUtils.fromFluidStack(hatch.tank.getLockedFluid().getFluid(), hatch.tank.getTankCapacity(0));
+            tag.putBoolean("special", true);
+            tag.putLong("amount", 0);
+            return List.of(new ViewGroup<>(List.of(tag)));
         }
 
         return FluidStorageProvider.INSTANCE.getGroups(serverPlayer, serverLevel, mmbe, b);
