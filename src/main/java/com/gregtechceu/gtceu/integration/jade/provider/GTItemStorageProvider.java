@@ -63,7 +63,7 @@ public enum GTItemStorageProvider implements IServerExtensionProvider<MetaMachin
                 list.add(stored.copyWithCount(stack));
             }
             return list.isEmpty() ? Collections.emptyList() : List.of(new ViewGroup<>(list));
-        } else if (machine instanceof MEPatternBufferProxyPartMachine proxy) {
+        } else if (GTCEu.Mods.isAE2Loaded() && machine instanceof MEPatternBufferProxyPartMachine proxy) {
             var buffer = proxy.getBuffer();
             if (buffer == null) return Collections.emptyList();
             return ItemStorageProvider.INSTANCE.getGroups(serverPlayer, serverLevel, buffer.holder, b);
