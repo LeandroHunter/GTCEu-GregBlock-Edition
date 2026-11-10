@@ -81,6 +81,18 @@ public final class OreRecipeHandler {
             return;
         }
 
+        var materialTags = orePrefix.getItemTags(material);
+        var hostTags = orePrefix.getItemParentTags();
+        // Keep the host-rock distinction when a mod supplies both tags.
+        Ingredient input;
+        if (materialTags.length > 0 && hostTags.length > 0) {
+            input = IntersectionIngredient.of(Ingredient.of(materialTags[0]), Ingredient.of(hostTags[0]));
+        } else {
+            var oreStack = ChemicalHelper.get(orePrefix, material);
+            if (oreStack.isEmpty()) return;
+            input = Ingredient.of(oreStack);
+        }
+
         Material byproductMaterial = property.getOreByProduct(0, material);
         ItemStack byproductStack = ChemicalHelper.get(gem, byproductMaterial);
         if (byproductStack.isEmpty()) {
@@ -108,8 +120,7 @@ public final class OreRecipeHandler {
         if (!crushedStack.isEmpty()) {
             GTRecipeBuilder builder = FORGE_HAMMER_RECIPES
                     .recipeBuilder("hammer_" + prefixString + material.getName() + "_ore_to_crushed_ore")
-                    .inputItems(IntersectionIngredient.of(Ingredient.of(orePrefix.getItemTags(material)[0]),
-                            Ingredient.of(orePrefix.getItemParentTags()[0])))
+                    .inputItems(input)
                     .category(GTRecipeCategories.ORE_FORGING)
                     .duration(10).EUt(16);
             if (material.hasProperty(PropertyKey.GEM) && !ChemicalHelper.get(gem, material).isEmpty()) {
@@ -122,8 +133,7 @@ public final class OreRecipeHandler {
 
             builder = MACERATOR_RECIPES
                     .recipeBuilder("macerate_" + prefixString + material.getName() + "_ore_to_crushed_ore")
-                    .inputItems(IntersectionIngredient.of(Ingredient.of(orePrefix.getItemTags(material)[0]),
-                            Ingredient.of(orePrefix.getItemParentTags()[0])))
+                    .inputItems(input)
                     .outputItems(crushedStack.copyWithCount(property.getOreMultiplier() * 2 * oreTypeMultiplier))
                     .chancedOutput(byproductStack, 1400, 850)
                     .EUt(2)
@@ -145,14 +155,10 @@ public final class OreRecipeHandler {
             float xp = Math.round(((1 + oreTypeMultiplier * 0.5f) * 0.5f - 0.05f) * 10f) / 10f;
             VanillaRecipeHelper.addSmeltingRecipe(provider,
                     "smelt_" + prefixString + material.getName() + "_ore_to_ingot",
-                    IntersectionIngredient.of(Ingredient.of(orePrefix.getItemTags(material)[0]),
-                            Ingredient.of(orePrefix.getItemParentTags()[0])),
-                    ingotStack, xp);
+                    input, ingotStack, xp);
             VanillaRecipeHelper.addBlastingRecipe(provider,
                     "smelt_" + prefixString + material.getName() + "_ore_to_ingot",
-                    IntersectionIngredient.of(Ingredient.of(orePrefix.getItemTags(material)[0]),
-                            Ingredient.of(orePrefix.getItemParentTags()[0])),
-                    ingotStack, xp);
+                    input, ingotStack, xp);
         }
     }
 
