@@ -1677,5 +1677,10 @@ public class FirstDegreeMaterials {
                 .components(Hydrogen, 2, Oxygen, 2)
                 .hazard(HazardProperty.HazardTrigger.ANY, GTMedicalConditions.CHEMICAL_BURNS, true)
                 .buildAndRegister();
+
+        IlmeniteSlag = new Material.Builder(GTCEu.id("ilmenite_slag"))
+                .dust()
+                .color(0x8B0000).iconSet(SAND)
+                .buildAndRegister();
     }
 }
