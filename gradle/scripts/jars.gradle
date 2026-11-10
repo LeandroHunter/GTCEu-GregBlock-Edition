@@ -26,6 +26,7 @@ afterEvaluate {
     reobfJar.archiveClassifier = ""
     tasks.withType(org.gradle.jvm.tasks.Jar).configureEach {
         destinationDirectory = file('build/libs/')
+        from(rootProject.file('LICENSE'), rootProject.file('COPYING'))
         manifest.attributes([
                 'MixinConfigs': 'gtceu.mixins.json',
                 'Specification-Title': project.name,
