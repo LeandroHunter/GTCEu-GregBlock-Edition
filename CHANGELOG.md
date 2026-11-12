@@ -1,3 +1,7 @@
+# GTCEu GregBlock Edition 7.5.3.11
+
+- Updated the JAR filename and Forge Mods screen details to use GregBlock Edition branding.
+
 # GTCEu GregBlock Edition 7.5.3.10
 
 - Fixed a JEI crash when a multiblock preview rebuilt its ingredient slots after a page change or block selection.

@@ -19,7 +19,7 @@ java {
 jar.archiveClassifier = "dev"
 
 base {
-    archivesName = "${project.name}-st-${libs.versions.minecraft.get()}"
+    archivesName = "${project.name}-gregblock-edition-${libs.versions.minecraft.get()}"
 }
 
 afterEvaluate {
@@ -29,12 +29,12 @@ afterEvaluate {
         from(rootProject.file('LICENSE'), rootProject.file('COPYING'))
         manifest.attributes([
                 'MixinConfigs': 'gtceu.mixins.json',
-                'Specification-Title': project.name,
+                'Specification-Title': mod_name,
                 'Specification-Version': mod_version,
-                'Specification-Vendor': 'StarT Dev Team',
+                'Specification-Vendor': mod_author,
                 'Implementation-Title': base.archivesName,
                 'Implementation-Version': version,
-                'Implementation-Vendor': 'StarT Dev Team',
+                'Implementation-Vendor': mod_author,
         ])
     }
 }
