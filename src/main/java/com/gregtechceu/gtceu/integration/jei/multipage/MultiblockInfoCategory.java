@@ -5,6 +5,7 @@ import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.common.data.machines.GTMultiMachines;
 
+import com.lowdragmc.lowdraglib.gui.ingredient.IRecipeIngredientSlot;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.jei.ModularUIRecipeCategory;
 
@@ -26,8 +27,9 @@ import mezz.jei.api.registration.IRecipeRegistration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -56,11 +58,13 @@ public class MultiblockInfoCategory extends ModularUIRecipeCategory<MultiblockIn
                 .toList());
     }
 
+    // AI-GENERATED (modified): Codex | 2026-11-12T01:40:26Z
     @Override
     public void createRecipeExtras(@NotNull IRecipeExtrasBuilder builder, @NotNull MultiblockInfoWrapper recipe,
                                    @NotNull IFocusGroup focuses) {
         super.createRecipeExtras(builder, recipe, focuses);
-        List<IRecipeSlotDrawable> slots = new ArrayList<>(builder.getRecipeSlots().getSlots());
+        var previewSlots = bindPreviewSlots(builder.getRecipeSlots().getSlots(),
+                recipe.modularUI.getFlatWidgetCollection());
         class ProxyRecipeWidget implements ISlottedRecipeWidget {
 
             private final ScreenPosition position = new ScreenPosition(0, 0);
@@ -72,19 +76,15 @@ public class MultiblockInfoCategory extends ModularUIRecipeCategory<MultiblockIn
                 var size = panel.getSize();
                 boolean inParent = Widget.isMouseOver(pos.x, pos.y, size.width, size.height, mouseX, mouseY);
                 if (!inParent) return Optional.empty();
-                List<Widget> widgets = recipe.modularUI.getFlatWidgetCollection();
-                return slots.stream()
-                        .filter(slot -> {
-                            Optional<String> slotName = slot.getSlotName();
-                            if (slotName.isEmpty()) return false;
-                            String name = slotName.get();
-                            int index = Integer.parseInt(name.substring(5));
-                            Widget widget = widgets.get(index);
-                            slot.setPosition(widget.getPositionX(), widget.getPositionY());
-                            return slot.isMouseOver(mouseX, mouseY);
-                        })
-                        .findFirst()
-                        .map(slot -> new RecipeSlotUnderMouse(slot, 0, 0));
+                for (Widget widget : recipe.modularUI.getFlatWidgetCollection()) {
+                    var slot = previewSlots.get(widget);
+                    if (slot == null || !widget.isVisible()) continue;
+                    slot.setPosition(widget.getPositionX(), widget.getPositionY());
+                    if (slot.isMouseOver(mouseX, mouseY)) {
+                        return Optional.of(new RecipeSlotUnderMouse(slot, 0, 0));
+                    }
+                }
+                return Optional.empty();
             }
 
             @Override
@@ -93,7 +93,27 @@ public class MultiblockInfoCategory extends ModularUIRecipeCategory<MultiblockIn
             }
         }
 
-        builder.addSlottedWidget(new ProxyRecipeWidget(), slots);
+        builder.addSlottedWidget(new ProxyRecipeWidget(), List.copyOf(previewSlots.values()));
+    }
+
+    // AI-GENERATED (added): Codex | 2026-11-12T01:40:26Z
+    private static Map<Widget, IRecipeSlotDrawable> bindPreviewSlots(List<IRecipeSlotDrawable> slots,
+                                                                    List<Widget> widgets) {
+        Map<Widget, IRecipeSlotDrawable> bindings = new IdentityHashMap<>();
+        for (var slot : slots) {
+            String name = slot.getSlotName().orElse("");
+            if (!name.startsWith("slot_")) continue;
+            try {
+                // LDLib names slots using the widget index at layout creation. The preview can later rebuild its widgets.
+                int index = Integer.parseInt(name, 5, name.length(), 10);
+                if (index >= 0 && index < widgets.size() && widgets.get(index) instanceof IRecipeIngredientSlot) {
+                    bindings.putIfAbsent(widgets.get(index), slot);
+                }
+            } catch (NumberFormatException ignored) {
+                // A slot without a valid LDLib index has no preview widget to bind.
+            }
+        }
+        return bindings;
     }
 
     @Override
