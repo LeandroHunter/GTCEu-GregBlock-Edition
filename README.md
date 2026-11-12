@@ -4,6 +4,8 @@ GregTech CEu Modern for the GregBlock Minecraft 1.20.1 Forge modpack. This proje
 
 The initial GregBlock build, `7.5.3.7`, includes selective backports for Jade, EMI, AE2, ore and fluid compatibility, and parallel recipe viewer indexing.
 
+Build `7.5.3.8` also makes multiblock structure guides appear when looking up a controller's recipes in JEI. The controller is indexed as the guide's output, matching the existing EMI behavior.
+
 [Issues](https://github.com/LeandroHunter/GTCEu-GregBlock-Edition/issues) · [Pull requests](https://github.com/LeandroHunter/GTCEu-GregBlock-Edition/pulls) · [Contribution guide](CONTRIBUTING.md)
 
 ## Build

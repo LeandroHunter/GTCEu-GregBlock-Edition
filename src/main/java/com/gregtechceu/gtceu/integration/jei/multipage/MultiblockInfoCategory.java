@@ -14,6 +14,7 @@ import net.minecraft.client.gui.navigation.ScreenPosition;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
+import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotDrawable;
 import mezz.jei.api.gui.inputs.RecipeSlotUnderMouse;
@@ -22,6 +23,7 @@ import mezz.jei.api.gui.widgets.ISlottedRecipeWidget;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.helpers.IJeiHelpers;
 import mezz.jei.api.recipe.IFocusGroup;
+import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.registration.IRecipeRegistration;
 import org.jetbrains.annotations.NotNull;
@@ -56,6 +58,14 @@ public class MultiblockInfoCategory extends ModularUIRecipeCategory<MultiblockIn
                 .filter(MultiblockMachineDefinition::isRenderXEIPreview)
                 .map(MultiblockInfoWrapper::new)
                 .toList());
+    }
+
+    @Override
+    public void setRecipe(@NotNull IRecipeLayoutBuilder builder, @NotNull MultiblockInfoWrapper recipe,
+                          @NotNull IFocusGroup focuses) {
+        super.setRecipe(builder, recipe, focuses);
+        // Index the controller as an output so its recipe lookup includes the structure guide.
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 138, 12).addItemStack(recipe.definition.asStack());
     }
 
     // AI-GENERATED (modified): Codex | 2026-11-12T01:40:26Z

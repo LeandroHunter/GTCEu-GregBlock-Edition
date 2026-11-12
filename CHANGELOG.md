@@ -1,3 +1,9 @@
+# GTCEu GregBlock Edition 7.5.3.10
+
+- Fixed a JEI crash when a multiblock preview rebuilt its ingredient slots after a page change or block selection.
+- Restored item names and tooltips in JEI recipe slots rendered by LowDragLib.
+- Added multiblock structure guides to JEI recipe lookup for their controllers.
+
 # Changes from Upstream (Non-Exhaustive List)
 
 ## New Features

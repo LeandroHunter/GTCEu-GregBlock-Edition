@@ -25,6 +25,7 @@
         "ftbchunks.FTBChunksClientMixin",
         "ftbchunks.LargeMapScreenMixin",
         "ftbchunks.RegionMapPanelMixin",
+        "jei.LDLibRecipeSlotTooltipMixin",
         "ldlib.ModularUIRecipeCategoryMixin",
         "ldlib.ModularWrapperWidgetMixin",
         "rei.FluidEntryRendererMixin",
